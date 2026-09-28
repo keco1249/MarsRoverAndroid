@@ -32,6 +32,11 @@ import coil3.compose.AsyncImage
 import com.kc.marsrovers.ui.theme.PhotoPlaceholder
 import com.kc.marsrovers.ui.theme.TextSecondary
 
+/**
+ * Home-screen rover card with two distinct touch zones: the upper area
+ * (photo, name, dates, photo count) triggers [onClick] for navigation,
+ * while the bottom camera row toggles an expandable list without navigating.
+ */
 @Composable
 fun RoverCard(
     rover: RoverUi,

@@ -48,6 +48,10 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 
+/**
+ * Read-only text field that displays the [selectedDate] and opens an inline
+ * [DatePicker] popup on tap. Selectable dates are clamped to [minDate]..[maxDate].
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateSelectorField(

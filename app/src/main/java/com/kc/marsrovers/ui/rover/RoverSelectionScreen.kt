@@ -18,9 +18,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,6 +36,7 @@ import com.kc.marsrovers.ui.components.RoverUi
 import com.kc.marsrovers.ui.components.roverSharedElement
 import com.kc.marsrovers.ui.theme.MarsRoversTheme
 import java.time.LocalDate
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
 fun RoverSelectionScreen(
@@ -52,6 +52,12 @@ fun RoverSelectionScreen(
     )
 }
 
+/**
+ * Stateless rover-detail screen that displays rover metadata, a date picker, and
+ * an infinite-scrolling photo grid. Pagination is driven by a [snapshotFlow] that
+ * monitors the grid's scroll position and calls [onLoadMore] when the user is
+ * within 8 items of the end.
+ */
 @Composable
 fun RoverSelectionScreen(
     modifier: Modifier = Modifier,
@@ -73,15 +79,19 @@ fun RoverSelectionScreen(
 
     val gridState = rememberLazyGridState()
 
-    val shouldLoadMore by remember {
-        derivedStateOf {
-            val lastVisible = gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            val totalItems = gridState.layoutInfo.totalItemsCount
-            lastVisible >= totalItems - 5
+    LaunchedEffect(Unit) {
+        snapshotFlow {
+            val layoutInfo = gridState.layoutInfo
+            val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val totalItems = layoutInfo.totalItemsCount
+            lastVisible to totalItems
         }
-    }
-    LaunchedEffect(shouldLoadMore) {
-        if (shouldLoadMore) onLoadMore()
+            .distinctUntilChanged()
+            .collect { (lastVisible, totalItems) ->
+                if (totalItems > 0 && lastVisible >= totalItems - 8) {
+                    onLoadMore()
+                }
+            }
     }
 
     val selectedDate = viewState.selectedDate
@@ -149,7 +159,7 @@ fun RoverSelectionScreen(
                 }
                 else -> {
                     items(photos, key = { it.uuid }) { photo ->
-                        RoverPhotoItem(photo)
+                        RoverPhotoItem(photo, modifier = Modifier.animateItem())
                     }
                     if (viewState.isLoadingMore) {
                         item(span = { GridItemSpan(maxLineSpan) }) {

@@ -13,6 +13,11 @@ val LocalSharedTransitionScope = staticCompositionLocalOf<SharedTransitionScope?
 
 val LocalNavAnimatedVisibilityScope = compositionLocalOf<AnimatedVisibilityScope?> { null }
 
+/**
+ * Applies a shared-element transition for the given [key]. Returns the
+ * modifier unchanged when called outside a [SharedTransitionScope] or
+ * [AnimatedVisibilityScope], so it is safe to use unconditionally.
+ */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun Modifier.roverSharedElement(key: String): Modifier {

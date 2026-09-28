@@ -70,12 +70,22 @@ class RoverSelectionViewModel @Inject constructor(
         loadPhotos(date, isNewDate = true)
     }
 
+    /**
+     * Requests the next page of photos. Calls are de-duplicated: concurrent or
+     * redundant invocations are ignored when a load is already in-flight or
+     * there are no more pages available.
+     */
     fun loadNextPage() {
         val state = _viewState.value
         if (state.isLoading || state.isLoadingMore || !state.canLoadMore) return
         loadPhotos(state.selectedDate, isNewDate = false)
     }
 
+    /**
+     * Loads a page of photos for the given [date]. When [isNewDate] is `true` the
+     * page counter resets and existing photos are cleared; otherwise the next page
+     * is appended to the current list.
+     */
     private fun loadPhotos(date: LocalDate, isNewDate: Boolean) {
         viewModelScope.launch {
             if (isNewDate) {

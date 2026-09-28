@@ -15,6 +15,12 @@ import kotlin.collections.firstOrNull
 interface RoverRepository {
     suspend fun getRovers(): List<Rover>
     suspend fun getRover(slug: String): Rover
+
+    /**
+     * Returns a previously fetched rover from the in-memory cache, or `null` if the
+     * rover has not been loaded yet. This is a synchronous, non-suspending lookup
+     * intended for instant UI population before a network round-trip completes.
+     */
     fun getCachedRover(slug: String): Rover?
     suspend fun getPhotos(slug: String, page: Int, perPage: Int, date: LocalDate? = null): List<Photo>
 }
@@ -25,6 +31,11 @@ class RoverRepositoryImpl @Inject constructor(
 
     private val roverCache = ConcurrentHashMap<String, Rover>()
 
+    /**
+     * Fetches the rover list, then concurrently loads each rover's details and
+     * first photo in parallel. Results are merged and cached in memory so that
+     * subsequent [getRover] and [getCachedRover] calls can return instantly.
+     */
     override suspend fun getRovers(): List<Rover> = coroutineScope {
         api.getRovers().data
             .map { rover ->

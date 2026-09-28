@@ -18,6 +18,10 @@ internal fun RoverDto.toRover(): Rover = Rover(
     photos = emptyList(),
 )
 
+/**
+ * Maps a photo DTO to a domain [Photo], selecting the best available image URL
+ * with a preference order of medium → full → large → small.
+ */
 internal fun PhotosResponse.PhotoDto.toPhoto(): Photo = Photo(
     id = id,
     imageUrl = attributes.images.medium
