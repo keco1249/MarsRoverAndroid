@@ -3,6 +3,7 @@ package com.kc.marsrovers.ui.components
 import com.kc.marsrovers.data.model.Photo
 import com.kc.marsrovers.data.model.Rover
 import java.time.LocalDate
+import java.util.UUID
 
 data class RoverUi(
     val slug: String,
@@ -16,6 +17,7 @@ data class RoverUi(
 )
 
 data class PhotoUi(
+    val uuid: UUID = UUID.randomUUID(),
     val id: Long,
     val imageUrl: String,
 )

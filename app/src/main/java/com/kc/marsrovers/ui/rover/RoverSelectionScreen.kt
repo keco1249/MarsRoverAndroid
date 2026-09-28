@@ -148,7 +148,7 @@ fun RoverSelectionScreen(
                     }
                 }
                 else -> {
-                    items(photos, key = { it.id }) { photo ->
+                    items(photos, key = { it.uuid }) { photo ->
                         RoverPhotoItem(photo)
                     }
                     if (viewState.isLoadingMore) {
